@@ -80,9 +80,9 @@ func _physics_process(delta: float) -> void:
 		is_diving = true
 		await get_tree().create_timer(dive_delay).timeout
 		velocity = Vector2(facing_dir * dive_speed, dive_speed) # down-forward
-		print("attack")
+		print("attacking")
 	elif Input.is_action_just_pressed("dash"):
-		print("attack")
+		print("attacking")
 
 	#dash
 	if Input.is_action_just_pressed("jump") and not is_dashing and not is_on_floor():
