@@ -4,100 +4,98 @@ extends CharacterBody2D
 @export var walk_speed := 250.0
 @export var run_speed := 350.0
 @export var jump_force := -500.0
-@export var dive_speed := 600.0   # fixed diagonal dive speed
+@export var dive_speed := 600.0
 @export var dash_speed := 400.0
 @export var dive_delay := 0.10 
+@export var wall_slide_speed := 100.0
+@export var wall_jump_push := 300.0
+@export var coyote_time := 0.15
+@export var jump_buffer_time := 0.15
 
 var is_diving := false
 var is_dashing := false
-var facing_dir := 1  # 1 = right, -1 = left
+var facing_dir := 1
+
+# timers
+var coyote_timer := 0.0
+var jump_buffer_timer := 0.0
 
 func _physics_process(delta: float) -> void:
-	# Gravity (only if not diving)
+	# update timers
+	if is_on_floor():
+		coyote_timer = coyote_time
+	else:
+		coyote_timer -= delta
+	
+	if jump_buffer_timer > 0:
+		jump_buffer_timer -= delta
+
+	# Gravity (unless diving or wall sliding)
 	if not is_on_floor() and not is_diving:
 		velocity.y += gravity * delta
 
-	# Walking
+	# Input direction
 	var input_dir = Input.get_axis("move_left", "move_right")
 	if input_dir != 0:
 		facing_dir = sign(input_dir)
-		if not is_diving:
-			if Input.is_action_pressed("dash"):
-				if is_on_floor():
-					if input_dir < 0:
-						if velocity.x > -run_speed:
-							velocity.x = -run_speed
-						if velocity.x < -run_speed:
-							velocity.x += 10
-					elif input_dir > 0:
-						if velocity.x < run_speed:
-							velocity.x = run_speed
-						if velocity.x > run_speed:
-							velocity.x -= 10
-				else:
-					if input_dir < 0:
-						if velocity.x > -run_speed:
-							velocity.x = -run_speed
-						if velocity.x < -run_speed:
-							velocity.x += 3
-					elif input_dir > 0:
-						if velocity.x < run_speed:
-							velocity.x = run_speed
-						if velocity.x > run_speed:
-							velocity.x -= 3
-			else:
-				if is_on_floor():
-					if input_dir < 0:
-						if velocity.x > -walk_speed:
-							velocity.x = -walk_speed
-						if velocity.x < -walk_speed:
-							velocity.x += 10
-					elif input_dir > 0:
-						if velocity.x < walk_speed:
-							velocity.x = walk_speed
-						if velocity.x > walk_speed:
-							velocity.x -= 10
-				else:
-					if input_dir < 0:
-						if velocity.x > -walk_speed:
-							velocity.x = -walk_speed
-						if velocity.x < -walk_speed:
-							velocity.x += 3
-					elif input_dir > 0:
-						if velocity.x < walk_speed:
-							velocity.x = walk_speed
-						if velocity.x > walk_speed:
-							velocity.x -= 3
-	elif not is_diving:
-		velocity.x = 0
 
-	# Jump
-	if Input.is_action_just_pressed("jump") and is_on_floor():
+	# Walking / Running (your existing movement)
+	if not is_diving:
+		_handle_horizontal_movement(input_dir)
+
+	# Jump buffering (store input)
+	if Input.is_action_just_pressed("jump"):
+		jump_buffer_timer = jump_buffer_time
+
+	# Perform jump if buffered + allowed
+	if jump_buffer_timer > 0 and coyote_timer > 0:
 		velocity.y = jump_force
+		jump_buffer_timer = 0
+		coyote_timer = 0
 
-	# Start dive (only in air, not already diving)
-	if Input.is_action_just_pressed("dash") and not is_on_floor() and not is_diving:
+	# Wall slide
+	if not is_on_floor() and is_on_wall() and input_dir == facing_dir and velocity.y > 0:
+		velocity.y = min(velocity.y, wall_slide_speed)
+
+		# Wall jump
+		if Input.is_action_just_pressed("jump"):
+			velocity.y = jump_force
+			velocity.x = -facing_dir * wall_jump_push
+
+	# Dive
+	if Input.is_action_just_pressed("dash") and not is_on_floor() and not is_diving and not is_on_wall():
 		is_diving = true
 		await get_tree().create_timer(dive_delay).timeout
-		velocity = Vector2(facing_dir * dive_speed, dive_speed) # down-forward
-		print("attacking")
+		velocity = Vector2(facing_dir * dive_speed, dive_speed)
+		print("attack")
 	elif Input.is_action_just_pressed("dash"):
-		print("attacking")
+		print("attack")
 
-	#dash
-	if Input.is_action_just_pressed("jump") and not is_dashing and not is_on_floor():
+	# Air dash (your mechanic, renamed slightly for clarity)
+	if Input.is_action_just_pressed("jump") and not is_dashing and not is_on_floor() and not is_on_wall():
 		is_dashing = true
 		is_diving = false
-		velocity = Vector2(0,0)
 		await get_tree().create_timer(.05).timeout
 		velocity = Vector2(facing_dir * dash_speed, -dash_speed)
-	# End dive on landing
-	if is_diving and is_on_floor():
+
+	# Reset states
+	if is_diving and is_on_floor() or is_on_wall():
 		is_diving = false
 	if is_dashing and is_on_floor():
 		is_dashing = false
-		# Momentum preserved — don't reset velocity.x
-		# Optionally reduce y velocity if too strong
-		velocity.y = 0  
+		velocity.y = 0
 
 	move_and_slide()
+
+
+func _handle_horizontal_movement(input_dir: float) -> void:
+	if input_dir == 0:
+		if not is_diving:
+			velocity.x = 0
+		return
+
+	var target_speed = walk_speed
+	if Input.is_action_pressed("dash"):
+		target_speed = run_speed
+
+	velocity.x = lerp(velocity.x, input_dir * target_speed, 0.2)

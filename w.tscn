@@ -4,19 +4,30 @@
 [ext_resource type="PackedScene" uid="uid://d3l2xqq8xb2jy" path="res://cat.tscn" id="2_gcqln"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_icj6o"]
-size = Vector2(6064, 26)
+size = Vector2(3864, 506.5)
 
 [node name="Node2D" type="Node2D"]
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
-position = Vector2(432, 533)
+position = Vector2(-712, 776)
 shape = SubResource("RectangleShape2D_icj6o")
 
 [node name="Sprite2D" type="Sprite2D" parent="StaticBody2D"]
-position = Vector2(572, 584)
-scale = Vector2(10.0625, 1)
+position = Vector2(-540, 776)
+scale = Vector2(32.8125, 4)
+texture = ExtResource("1_md2ht")
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2"]
+position = Vector2(3016, 266.75)
+shape = SubResource("RectangleShape2D_icj6o")
+
+[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D2"]
+position = Vector2(1728, 260)
+scale = Vector2(10.0625, 4.1875)
 texture = ExtResource("1_md2ht")
 
 [node name="Node2D" parent="." instance=ExtResource("2_gcqln")]
