@@ -6,8 +6,9 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sthjf"]
 size = Vector2(144, 64)
 
-[node name="Node2D" type="CharacterBody2D"]
+[node name="Node2D" type="CharacterBody2D" groups=["player"]]
 script = ExtResource("1_0mbe7")
+walk_speed = 200.0
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(0, -9.53674e-07)

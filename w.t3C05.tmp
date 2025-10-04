@@ -1,9 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://skwd63yb0oee"]
+[gd_scene load_steps=5 format=3 uid="uid://skwd63yb0oee"]
 
 [ext_resource type="Texture2D" uid="uid://b62o4xi5g2bta" path="res://icon.svg" id="1_md2ht"]
 [ext_resource type="PackedScene" uid="uid://d3l2xqq8xb2jy" path="res://cat.tscn" id="2_gcqln"]
 [ext_resource type="PackedScene" uid="uid://comncfleod4f5" path="res://camera_rig.tscn" id="3_vqkbv"]
-[ext_resource type="PackedScene" uid="uid://ds7u4rc56mi2b" path="res://camerazone.tscn" id="3_xqfpx"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_icj6o"]
 size = Vector2(3864, 506.5)
@@ -34,10 +33,4 @@ texture = ExtResource("1_md2ht")
 
 [node name="Node2D" parent="." instance=ExtResource("2_gcqln")]
 
-[node name="CameraZone" parent="." instance=ExtResource("3_xqfpx")]
-position = Vector2(640, 328)
-zoom = Vector2(0.5, 0.5)
-offset = Vector2(500, 0)
-
-[node name="CameraRig" parent="." node_paths=PackedStringArray("target") instance=ExtResource("3_vqkbv")]
-target = NodePath("../Node2D")
+[node name="CameraRig" parent="." instance=ExtResource("3_vqkbv")]
