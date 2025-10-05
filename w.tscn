@@ -41,3 +41,6 @@ offset = Vector2(500, 0)
 
 [node name="CameraRig" parent="." node_paths=PackedStringArray("target") instance=ExtResource("3_vqkbv")]
 target = NodePath("../Node2D")
+
+[node name="CameraZone2" parent="." instance=ExtResource("3_xqfpx")]
+position = Vector2(336, 328)

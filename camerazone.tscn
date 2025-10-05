@@ -3,11 +3,10 @@
 [ext_resource type="Script" path="res://camerazone.gd" id="1_5ifue"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sw2vd"]
-size = Vector2(234, 384)
+size = Vector2(21, 384)
 
 [node name="CameraZone" type="Area2D"]
 script = ExtResource("1_5ifue")
-zoom = Vector2(0.1, 0.1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_sw2vd")

@@ -99,3 +99,10 @@ func _handle_horizontal_movement(input_dir: float) -> void:
 		target_speed = run_speed
 
 	velocity.x = lerp(velocity.x, input_dir * target_speed, 0.2)
+
+func _input(event):
+	if event.is_action_pressed("toggle_fullscreen"):
+		if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN:
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+		else:
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
