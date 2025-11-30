@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
 @export var gravity := 1000.0
-@export var walk_speed := 250.0
+@export var walk_speed := 200.0
 @export var run_speed := 350.0
 @export var jump_force := -500.0
 @export var dive_speed := 600.0
@@ -12,6 +12,8 @@ extends CharacterBody2D
 @export var coyote_time := 0.15
 @export var jump_buffer_time := 0.15
 
+@onready var sprite: AnimatedSprite2D = $Sprite
+
 var is_diving := false
 var is_dashing := false
 var facing_dir := 1
@@ -20,87 +22,144 @@ var facing_dir := 1
 var coyote_timer := 0.0
 var jump_buffer_timer := 0.0
 
+# animation state
+var current_anim := ""
+
+func play_anim(name: String, force: bool = false) -> void:
+	if not force and current_anim == name:
+		return
+	current_anim = name
+	sprite.play(name)
+
+
 func _physics_process(delta: float) -> void:
-	# update timers
+	# --- timers ---
 	if is_on_floor():
 		coyote_timer = coyote_time
 	else:
 		coyote_timer -= delta
 	
-	if jump_buffer_timer > 0:
+	if jump_buffer_timer > 0.0:
 		jump_buffer_timer -= delta
 
-	# Gravity (unless diving or wall sliding)
+	# --- gravity ---
 	if not is_on_floor() and not is_diving:
 		velocity.y += gravity * delta
 
-	# Input direction
-	var input_dir = Input.get_axis("move_left", "move_right")
+	# --- input & facing ---
+	var input_dir := Input.get_axis("move_left", "move_right")
 	if input_dir != 0:
 		facing_dir = sign(input_dir)
+		# flip sprite based on direction (0.167 is your base scale)
+		sprite.scale.x = input_dir * 0.167
 
-	# Walking / Running (your existing movement)
+	# --- horizontal movement ---
 	if not is_diving:
 		_handle_horizontal_movement(input_dir)
 
-	# Jump buffering (store input)
+	# --- jump buffering ---
 	if Input.is_action_just_pressed("jump"):
 		jump_buffer_timer = jump_buffer_time
 
-	# Perform jump if buffered + allowed
-	if jump_buffer_timer > 0 and coyote_timer > 0:
+	# perform jump if buffered + allowed (coyote)
+	if jump_buffer_timer > 0.0 and coyote_timer > 0.0:
 		velocity.y = jump_force
-		jump_buffer_timer = 0
-		coyote_timer = 0
+		jump_buffer_timer = 0.0
+		coyote_timer = 0.0
+		# force jump animation to restart on every grounded jump
+		play_anim("jump", true)
 
-	# Wall slide
-	if not is_on_floor() and is_on_wall() and input_dir == facing_dir and velocity.y > 0:
+	# --- wall slide + wall jump ---
+	if not is_on_floor() and is_on_wall() and input_dir == facing_dir and velocity.y > 0.0:
 		velocity.y = min(velocity.y, wall_slide_speed)
 
-		# Wall jump
 		if Input.is_action_just_pressed("jump"):
 			velocity.y = jump_force
 			velocity.x = -facing_dir * wall_jump_push
+			play_anim("jump", true)  # restart jump anim on wall jump too
 
-	# Dive
+	# --- dive ---
 	if Input.is_action_just_pressed("dash") and not is_on_floor() and not is_diving and not is_on_wall():
 		is_diving = true
 		await get_tree().create_timer(dive_delay).timeout
 		velocity = Vector2(facing_dir * dive_speed, dive_speed)
-		print("attack")
+		# if you have a dive anim, you can also force it here:
+		# play_anim("dive", true)
 	elif Input.is_action_just_pressed("dash"):
-		print("attack")
+		# grounded attack, if you add one later
+		pass
 
-	# Air dash (your mechanic, renamed slightly for clarity)
+	# --- air dash (your second jump) ---
 	if Input.is_action_just_pressed("jump") and not is_dashing and not is_on_floor() and not is_on_wall():
 		is_dashing = true
 		is_diving = false
-		await get_tree().create_timer(.05).timeout
+		# force jump animation again for the "second jump"
+		play_anim("jump", true)
+		await get_tree().create_timer(0.05).timeout
 		velocity = Vector2(facing_dir * dash_speed, -dash_speed)
+		# if you later want a separate dash anim, swap to "dash" here
 
-	# Reset states
-	if is_diving and is_on_floor() or is_on_wall():
+	# --- reset states ---
+	if is_diving and (is_on_floor() or is_on_wall()):
 		is_diving = false
 	if is_dashing and is_on_floor():
 		is_dashing = false
-		velocity.y = 0
+		velocity.y = 0.0
 
+	# --- move ---
 	move_and_slide()
+
+	# --- animation state update AFTER movement ---
+	_update_animation(input_dir)
 
 
 func _handle_horizontal_movement(input_dir: float) -> void:
-	if input_dir == 0:
+	if input_dir == 0.0:
 		if not is_diving:
-			velocity.x = 0
+			velocity.x = lerp(velocity.x, 0.0, 0.2)
 		return
 
-	var target_speed = walk_speed
+	var target_speed := walk_speed
+	
 	if Input.is_action_pressed("dash"):
 		target_speed = run_speed
+	else:
+		target_speed = walk_speed
 
 	velocity.x = lerp(velocity.x, input_dir * target_speed, 0.2)
 
-func _input(event):
+
+func _update_animation(input_dir: float) -> void:
+	# priority: special states first
+	if is_diving:
+		play_anim("dive")
+		return
+
+	if is_dashing:
+		play_anim("running")
+		play_anim("jump")
+		return
+	# airborne
+	if not is_on_floor():
+		if velocity.y < 0.0:
+			# going up: keep jump anim (it was forced when jump started)
+			play_anim("jump")
+		else:
+			# falling: use fall anim if you have one, or reuse jump
+			play_anim("fall")  # or "jump" if no separate fall anim
+		return
+
+	# grounded movement
+	if abs(velocity.x) > 10.0:
+		if Input.is_action_pressed("dash"):
+			play_anim("running")
+		else:
+			play_anim("walking")
+	else:
+		play_anim("idle")
+
+
+func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_fullscreen"):
 		if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)

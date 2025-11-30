@@ -24,11 +24,11 @@ texture = ExtResource("1_md2ht")
 [node name="StaticBody2D2" type="StaticBody2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2"]
-position = Vector2(3016, 266.75)
+position = Vector2(3032, 248)
 shape = SubResource("RectangleShape2D_icj6o")
 
 [node name="Sprite2D" type="Sprite2D" parent="StaticBody2D2"]
-position = Vector2(1728, 260)
+position = Vector2(1736, 264)
 scale = Vector2(10.0625, 4.1875)
 texture = ExtResource("1_md2ht")
 
@@ -44,3 +44,4 @@ target = NodePath("../Node2D")
 
 [node name="CameraZone2" parent="." instance=ExtResource("3_xqfpx")]
 position = Vector2(336, 328)
+zoom = Vector2(3, 3)

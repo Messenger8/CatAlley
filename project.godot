@@ -21,7 +21,6 @@ window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/size/mode=3
 window/size/resizable=false
-window/stretch/mode="viewport"
 
 [global_group]
 
@@ -74,4 +73,5 @@ toggle_fullscreen={
 
 [rendering]
 
+textures/canvas_textures/default_texture_filter=2
 renderer/rendering_method="mobile"
