@@ -1,5 +1,6 @@
 extends CharacterBody2D
 
+var spawn_position := Vector2(0,0)
 @export var gravity := 1000.0
 @export var walk_speed := 200.0
 @export var run_speed := 350.0
@@ -8,7 +9,7 @@ extends CharacterBody2D
 @export var dash_speed := 400.0
 @export var dive_delay := 0.10 
 @export var wall_slide_speed := 100.0
-@export var wall_jump_push := 300.0
+@export var wall_jump_push := 3000.0
 @export var coyote_time := 0.15
 @export var jump_buffer_time := 0.15
 
@@ -25,6 +26,12 @@ var jump_buffer_timer := 0.0
 # animation state
 var current_anim := ""
 
+func _ready() -> void:
+	spawn_position = global_position  # or get it from a SpawnPoint node
+	# If you want to use a separate node:
+	# var spawn_node = get_parent().get_node("SpawnPoint")
+	# spawn_position = spawn_node.global_position
+
 func play_anim(name: String, force: bool = false) -> void:
 	if not force and current_anim == name:
 		return
@@ -33,6 +40,9 @@ func play_anim(name: String, force: bool = false) -> void:
 
 
 func _physics_process(delta: float) -> void:
+		# Always start from neutral pose this frame
+	sprite.position.x = 0
+	sprite.rotation_degrees = 0
 	# --- timers ---
 	if is_on_floor():
 		coyote_timer = coyote_time
@@ -48,10 +58,19 @@ func _physics_process(delta: float) -> void:
 
 	# --- input & facing ---
 	var input_dir := Input.get_axis("move_left", "move_right")
-	if input_dir != 0:
+
+# Only change facing_dir when NOT stuck to a wall.
+# This keeps the wall side consistent for the whole slide.
+	if input_dir != 0 and not is_on_wall():
 		facing_dir = sign(input_dir)
-		# flip sprite based on direction (0.167 is your base scale)
-		sprite.scale.x = input_dir * 0.167
+
+# Always flip using facing_dir (stable), not raw input_dir
+	sprite.scale.x = facing_dir * 0.167
+
+
+
+
+
 
 	# --- horizontal movement ---
 	if not is_diving:
@@ -69,14 +88,25 @@ func _physics_process(delta: float) -> void:
 		# force jump animation to restart on every grounded jump
 		play_anim("jump", true)
 
+	
+	var is_wall_sliding := false
 	# --- wall slide + wall jump ---
 	if not is_on_floor() and is_on_wall() and input_dir == facing_dir and velocity.y > 0.0:
+		is_wall_sliding = true
 		velocity.y = min(velocity.y, wall_slide_speed)
+		if facing_dir == 1:
+			sprite.rotation_degrees = 270
+			sprite.position.x = 39
+		else:
+			sprite.position.x = -39
+			sprite.rotation_degrees = 90
+		play_anim("walking", false)
 
 		if Input.is_action_just_pressed("jump"):
 			velocity.y = jump_force
 			velocity.x = -facing_dir * wall_jump_push
-			play_anim("jump", true)  # restart jump anim on wall jump too
+			play_anim("jump", true)  # restart jump anim on wall jump tooa
+		
 
 	# --- dive ---
 	if Input.is_action_just_pressed("dash") and not is_on_floor() and not is_diving and not is_on_wall():
@@ -89,7 +119,7 @@ func _physics_process(delta: float) -> void:
 		# grounded attack, if you add one later
 		pass
 
-	# --- air dash (your second jump) ---
+	# --- air dash (your second jump) ---da
 	if Input.is_action_just_pressed("jump") and not is_dashing and not is_on_floor() and not is_on_wall():
 		is_dashing = true
 		is_diving = false
@@ -165,3 +195,6 @@ func _input(event: InputEvent) -> void:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 		else:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+			
+func respawn() -> void:
+	global_position = spawn_position

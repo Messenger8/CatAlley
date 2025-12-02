@@ -37,6 +37,9 @@
 [ext_resource type="Texture2D" uid="uid://bn0nalq1tvgor" path="res://animations/walking_anim/frame0020.png" id="19_x6061"]
 [ext_resource type="Texture2D" uid="uid://bqoia510q26cg" path="res://animations/walking_anim/frame0021.png" id="20_5k5jk"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sthjf"]
+size = Vector2(144, 64)
+
 [sub_resource type="SpriteFrames" id="SpriteFrames_qmj4d"]
 animations = [{
 "frames": [{
@@ -170,21 +173,17 @@ animations = [{
 "speed": 12.0
 }]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_sthjf"]
-size = Vector2(144, 64)
-
 [node name="Node2D" type="CharacterBody2D" groups=["player"]]
 texture_filter = 4
 texture_repeat = 1
 script = ExtResource("1_0mbe7")
 
-[node name="Sprite" type="AnimatedSprite2D" parent="."]
-texture_filter = 4
-position = Vector2(-1.90735e-06, 0)
-scale = Vector2(0.167, 0.167)
-sprite_frames = SubResource("SpriteFrames_qmj4d")
-animation = &"dive"
-offset = Vector2(-200, 15)
-
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_sthjf")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+texture_filter = 4
+scale = Vector2(0.167, 0.167)
+sprite_frames = SubResource("SpriteFrames_qmj4d")
+animation = &"idle"
+offset = Vector2(-194.012, 15)

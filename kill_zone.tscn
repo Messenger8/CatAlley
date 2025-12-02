@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=3 uid="uid://wsdl2wjgshrq"]
+
+[ext_resource type="Texture2D" uid="uid://b62o4xi5g2bta" path="res://icon.svg" id="1_b5hv2"]
+[ext_resource type="Script" path="res://kill_zone.gd" id="1_sfeqv"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_jomfu"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_b5hv2")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_o7foy"]
+size = Vector2(128, 128)
+
+[node name="KillZone" type="Area2D"]
+modulate = Color(1, 0, 0, 1)
+script = ExtResource("1_sfeqv")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_jomfu")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_o7foy")
