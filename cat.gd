@@ -17,6 +17,7 @@ var spawn_position := Vector2(0,0)
 
 var is_diving := false
 var is_dashing := false
+var is_wall_sliding := false
 var facing_dir := 1
 
 # timers
@@ -89,7 +90,7 @@ func _physics_process(delta: float) -> void:
 		play_anim("jump", true)
 
 	
-	var is_wall_sliding := false
+	is_wall_sliding = false
 	# --- wall slide + wall jump ---
 	if not is_on_floor() and is_on_wall() and input_dir == facing_dir and velocity.y > 0.0:
 		is_wall_sliding = true
@@ -100,7 +101,7 @@ func _physics_process(delta: float) -> void:
 		else:
 			sprite.position.x = -39
 			sprite.rotation_degrees = 90
-		play_anim("walking", false)
+		play_anim("walking", true)
 
 		if Input.is_action_just_pressed("jump"):
 			velocity.y = jump_force
@@ -135,12 +136,12 @@ func _physics_process(delta: float) -> void:
 	if is_dashing and is_on_floor():
 		is_dashing = false
 		velocity.y = 0.0
-
 	# --- move ---
 	move_and_slide()
 
 	# --- animation state update AFTER movement ---
 	_update_animation(input_dir)
+
 
 
 func _handle_horizontal_movement(input_dir: float) -> void:
@@ -161,13 +162,15 @@ func _handle_horizontal_movement(input_dir: float) -> void:
 
 func _update_animation(input_dir: float) -> void:
 	# priority: special states first
-	if is_diving:
+	if is_wall_sliding:
+		play_anim("walking")
+	
+	elif is_diving:
 		play_anim("dive")
 		return
 
-	if is_dashing:
-		play_anim("running")
-		play_anim("jump")
+	elif is_dashing:
+		play_anim("jump", true)
 		return
 	# airborne
 	if not is_on_floor():

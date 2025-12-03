@@ -18,18 +18,7 @@ size = Vector2(1317, 386)
 position = Vector2(640, 328)
 
 [node name="Node2D" parent="." instance=ExtResource("2_gcqln")]
-position = Vector2(-1024, 472)
-gravity = 1000.0
-walk_speed = 200.0
-run_speed = 350.0
-jump_force = -500.0
-dive_speed = 600.0
-dash_speed = 400.0
-dive_delay = 0.1
-wall_slide_speed = 100.0
-wall_jump_push = 3000.0
-coyote_time = 0.15
-jump_buffer_time = 0.15
+position = Vector2(5824, 160)
 
 [node name="CameraZone" parent="." instance=ExtResource("3_xqfpx")]
 position = Vector2(640, 328)
@@ -64,6 +53,10 @@ shape = SubResource("RectangleShape2D_icj6o")
 position = Vector2(-4584, 272)
 shape = SubResource("RectangleShape2D_icj6o")
 
+[node name="CollisionShape2D5" type="CollisionShape2D" parent="Node2D2/StaticBody2D2"]
+position = Vector2(-3312, -224)
+shape = SubResource("RectangleShape2D_icj6o")
+
 [node name="Sprite2D" type="Sprite2D" parent="Node2D2/StaticBody2D2"]
 position = Vector2(760, 688)
 scale = Vector2(10.0625, 4.1875)
@@ -74,6 +67,11 @@ position = Vector2(-2952, 274)
 scale = Vector2(10.0625, 3.90625)
 texture = ExtResource("1_md2ht")
 
+[node name="Sprite2D6" type="Sprite2D" parent="Node2D2/StaticBody2D2"]
+position = Vector2(-1680, -224)
+scale = Vector2(10.0625, 3.90625)
+texture = ExtResource("1_md2ht")
+
 [node name="Sprite2D2" type="Sprite2D" parent="Node2D2/StaticBody2D2"]
 position = Vector2(1486, 520)
 scale = Vector2(10.2813, 4.1875)
@@ -81,6 +79,11 @@ texture = ExtResource("1_md2ht")
 
 [node name="Sprite2D3" type="Sprite2D" parent="Node2D2/StaticBody2D2"]
 position = Vector2(5840, 584)
+scale = Vector2(10.2813, 4.1875)
+texture = ExtResource("1_md2ht")
+
+[node name="Sprite2D8" type="Sprite2D" parent="Node2D2/StaticBody2D2"]
+position = Vector2(7960, 1488)
 scale = Vector2(10.2813, 4.1875)
 texture = ExtResource("1_md2ht")
 
@@ -97,6 +100,20 @@ shape = SubResource("RectangleShape2D_gvmew")
 position = Vector2(5840, 512)
 shape = SubResource("RectangleShape2D_gvmew")
 
+[node name="CollisionShape2D7" type="CollisionShape2D" parent="Node2D2/StaticBody2D2"]
+position = Vector2(7968, 1416)
+shape = SubResource("RectangleShape2D_gvmew")
+
 [node name="KillZone" parent="." instance=ExtResource("5_ok5x0")]
 position = Vector2(4984, 1152)
+scale = Vector2(10, 10)
+
+[node name="KillZone2" parent="." instance=ExtResource("5_ok5x0")]
+position = Vector2(6464, 1264)
+rotation = 0.785398
+scale = Vector2(10, 10)
+
+[node name="KillZone3" parent="." instance=ExtResource("5_ok5x0")]
+position = Vector2(7584, 128)
+rotation = 0.785398
 scale = Vector2(10, 10)
