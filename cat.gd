@@ -12,6 +12,7 @@ var spawn_position := Vector2(0,0)
 @export var wall_jump_push := 3000.0
 @export var coyote_time := 0.15
 @export var jump_buffer_time := 0.15
+@export var jump_phase := 0
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 
@@ -69,10 +70,6 @@ func _physics_process(delta: float) -> void:
 	sprite.scale.x = facing_dir * 0.167
 
 
-
-
-
-
 	# --- horizontal movement ---
 	if not is_diving:
 		_handle_horizontal_movement(input_dir)
@@ -86,8 +83,9 @@ func _physics_process(delta: float) -> void:
 		velocity.y = jump_force
 		jump_buffer_timer = 0.0
 		coyote_timer = 0.0
-		# force jump animation to restart on every grounded jump
+		jump_phase = 1 - jump_phase  # flip state on jump
 		play_anim("jump", true)
+
 
 	
 	is_wall_sliding = false
@@ -106,8 +104,9 @@ func _physics_process(delta: float) -> void:
 		if Input.is_action_just_pressed("jump"):
 			velocity.y = jump_force
 			velocity.x = -facing_dir * wall_jump_push
-			play_anim("jump", true)  # restart jump anim on wall jump tooa
-		
+			jump_phase = 1 - jump_phase
+			play_anim("jump", true)
+
 
 	# --- dive ---
 	if Input.is_action_just_pressed("dash") and not is_on_floor() and not is_diving and not is_on_wall():
@@ -124,11 +123,11 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("jump") and not is_dashing and not is_on_floor() and not is_on_wall():
 		is_dashing = true
 		is_diving = false
-		# force jump animation again for the "second jump"
+		jump_phase = 1 - jump_phase
 		play_anim("jump", true)
 		await get_tree().create_timer(0.05).timeout
 		velocity = Vector2(facing_dir * dash_speed, -dash_speed)
-		# if you later want a separate dash anim, swap to "dash" here
+	# if you later want a separate dash anim, swap to "dash" here
 
 	# --- reset states ---
 	if is_diving and (is_on_floor() or is_on_wall()):
