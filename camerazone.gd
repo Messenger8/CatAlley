@@ -2,7 +2,7 @@ extends Area2D
 
 @export var zoom: Vector2 = Vector2(1, 1)         # zoom in/out
 @export var offset: Vector2 = Vector2.ZERO        # lead camera forward/back
-@export var smooth_speed: float = 2.0             # transition speed
+@export var smooth_speed: float = 3.0             # transition speed
 
 func _ready():
 	connect("body_entered", Callable(self, "_on_body_entered"))

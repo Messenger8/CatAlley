@@ -20,8 +20,8 @@ func _physics_process(delta: float) -> void:
 
 	solid_shape.disabled = not should_be_solid
 	if solid_shape.disabled:
-		#CHANGE TO SPRITE FRAMES
-		sprite.modulate = Color(0.061, 0.061, 0.061)
-		
+		sprite.frame = 1
+		sprite.self_modulate = Color8(255, 255, 255, 70)   # transparent
 	else:
-		sprite.modulate = Color(1, 1, 1)
+		sprite.frame = 0
+		sprite.self_modulate = Color8(255, 255, 255, 255) # solid

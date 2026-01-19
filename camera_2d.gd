@@ -5,6 +5,9 @@ var target_zoom: Vector2 = Vector2(1, 1)
 var target_offset: Vector2 = Vector2.ZERO
 var smooth_speed: float = 5.0
 
+func _ready() -> void:
+	$AudioStreamPlayer2D.stream.loop = true
+
 func _physics_process(delta: float) -> void:
 	if not is_instance_valid(target):
 		return

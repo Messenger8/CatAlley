@@ -30,6 +30,7 @@ var current_anim := ""
 
 func _ready() -> void:
 	spawn_position = global_position  # or get it from a SpawnPoint node
+	
 	# If you want to use a separate node:
 	# var spawn_node = get_parent().get_node("SpawnPoint")
 	# spawn_position = spawn_node.global_position
